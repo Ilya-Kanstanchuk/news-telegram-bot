@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class WeatherService {
     private final WebClient client;
-    public Weather getForecast(Double latitude, Double longitude){
+    public Weather getForecast(Double latitude, Double longitude, String cityName){
         Weather weather;
         try {
             weather = client.get()
@@ -31,6 +31,7 @@ public class WeatherService {
         if (weather == null){
             throw new RuntimeException("Weather object is null");
         }
+        weather.setCityName(cityName);
         return weather;
     }
 }

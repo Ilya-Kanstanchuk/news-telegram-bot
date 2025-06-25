@@ -22,7 +22,7 @@ public class User {
     @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "city_id", referencedColumnName = "cityId")
     private City city;
 }

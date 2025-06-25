@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserInitializationService {
     private final UserRepository repository;
-    @Transactional
     public void handleUserPressStart(Long chatId, String name, City city){
         try {
             User user = repository.getByChatId(chatId);

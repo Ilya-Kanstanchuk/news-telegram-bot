@@ -12,7 +12,6 @@ import java.util.HashSet;
 @RequiredArgsConstructor
 public class CityService {
     private final CityRepository repository;
-    @Transactional
     public City handleUserAddCity(String name, Double latitude, Double longitude){
         City city = repository.getByName(name);
         if (city == null){
@@ -36,6 +35,6 @@ public class CityService {
         city.setName(name);
         city.setLatitude(latitude);
         city.setLongitude(longitude);
-        return city;
+        return repository.save(city);
     }
 }

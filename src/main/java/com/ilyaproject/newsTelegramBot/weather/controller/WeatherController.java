@@ -2,6 +2,7 @@ package com.ilyaproject.newsTelegramBot.weather.controller;
 
 import com.ilyaproject.newsTelegramBot.weather.DTO.Weather;
 import com.ilyaproject.newsTelegramBot.weather.service.WeatherService;
+import com.ilyaproject.newsTelegramBot.weather.service.WeatherToMessageConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
@@ -12,15 +13,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
-@RequestMapping
-@CrossOrigin
 public class WeatherController {
     private final WeatherService service;
-    @GetMapping("/test/forecast")
-    public ResponseEntity<?> getForecast(){
-        Weather weather = service.getForecast(53.9, 27.56667);
-        return new ResponseEntity<>(weather, HttpStatus.OK);
+    private final WeatherToMessageConverter weatherToMessage;
+    public String getForecast(Double latitude, Double longitude, String cityName){
+        Weather weather = service.getForecast(latitude, longitude, cityName);
+        return weatherToMessage.convert(weather);
     }
 }

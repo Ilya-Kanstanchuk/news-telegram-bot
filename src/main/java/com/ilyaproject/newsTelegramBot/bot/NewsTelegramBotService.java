@@ -3,6 +3,7 @@ package com.ilyaproject.newsTelegramBot.bot;
 import com.ilyaproject.newsTelegramBot.city.controller.CityInitialization;
 import com.ilyaproject.newsTelegramBot.model.City;
 import com.ilyaproject.newsTelegramBot.user.controller.UserInitialization;
+import com.ilyaproject.newsTelegramBot.weather.controller.WeatherController;
 import com.ilyaproject.newsTelegramBot.weather.service.CoordinatesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
     private UserInitialization initialization;
     @Autowired
     private CoordinatesService coordinatesService;
+    @Autowired
+    private WeatherController weatherController;
     private final String welcomeMessage = "Hi, I'm Morning Bot and my goal is to make your morning more informative. " +
             "I'm going to send you latest news articles, currency information and weather in your city. To continue " +
             "please enter your city name: ";
@@ -67,6 +70,7 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
                                 throw new RuntimeException("City object is null");
                             }
                             initialization.userStart(chatId, name, city);
+                            printMessage(chatId, weatherController.getForecast(coordinates.get(0), coordinates.get(1), messageText));
                             printMessage(chatId, "We are done with initialization!");
                             printMessage(chatId, "Enter /start to begin");
                             userStates.remove(chatId);
