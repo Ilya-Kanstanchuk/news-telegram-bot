@@ -2,6 +2,9 @@ package com.ilyaproject.newsTelegramBot.bot;
 
 import com.ilyaproject.newsTelegramBot.city.controller.CityInitialization;
 import com.ilyaproject.newsTelegramBot.model.City;
+import com.ilyaproject.newsTelegramBot.model.User;
+import com.ilyaproject.newsTelegramBot.news.controller.NewsController;
+import com.ilyaproject.newsTelegramBot.repository.UserRepository;
 import com.ilyaproject.newsTelegramBot.user.controller.UserInitialization;
 import com.ilyaproject.newsTelegramBot.weather.controller.WeatherController;
 import com.ilyaproject.newsTelegramBot.weather.service.CoordinatesService;
@@ -24,13 +27,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NewsTelegramBotService implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     @Autowired
+    private UserRepository repository;
+    @Autowired
     private CityInitialization cityInitialization;
     @Autowired
     private UserInitialization initialization;
     @Autowired
     private CoordinatesService coordinatesService;
     @Autowired
-    private WeatherController weatherController;
+    private NewsController controller;
     private final String welcomeMessage = "Hi, I'm Morning Bot and my goal is to make your morning more informative. " +
             "I'm going to send you latest news articles, currency information and weather in your city. To continue " +
             "please enter your city name: ";
@@ -58,7 +63,8 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
                         printMessage(chatId, welcomeMessage);
                         userStates.put(chatId, BotState.AWAITING_CITY);
                     }else{
-                        printMessage(chatId, "Please enter /start to begin");
+                        printMessage(chatId, controller.getNews());
+                        //printMessage(chatId, "Please enter /start to begin");
                     }
                     break;
                 case AWAITING_CITY:
@@ -70,8 +76,7 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
                                 throw new RuntimeException("City object is null");
                             }
                             initialization.userStart(chatId, name, city);
-                            printMessage(chatId, weatherController.getForecast(coordinates.get(0), coordinates.get(1), messageText));
-                            printMessage(chatId, "We are done with initialization!");
+                            printMessage(chatId, "You where successfully register/update your information!");
                             printMessage(chatId, "Enter /start to begin");
                             userStates.remove(chatId);
                         }else{
