@@ -1,7 +1,9 @@
 package com.ilyaproject.newsTelegramBot.bot;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.ilyaproject.newsTelegramBot.weather.service.CityService;
+import com.ilyaproject.newsTelegramBot.city.controller.CityInitialization;
+import com.ilyaproject.newsTelegramBot.model.City;
+import com.ilyaproject.newsTelegramBot.user.controller.UserInitialization;
+import com.ilyaproject.newsTelegramBot.weather.service.CoordinatesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,13 +23,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NewsTelegramBotService implements LongPollingSingleThreadUpdateConsumer {
     private final TelegramClient telegramClient;
     @Autowired
-    private CityService cityService;
+    private CityInitialization cityInitialization;
+    @Autowired
+    private UserInitialization initialization;
+    @Autowired
+    private CoordinatesService coordinatesService;
     private final String welcomeMessage = "Hi, I'm Morning Bot and my goal is to make your morning more informative. " +
             "I'm going to send you latest news articles, currency information and weather in your city. To continue " +
             "please enter your city name: ";
     private final Map<Long, BotState> userStates = new ConcurrentHashMap<>();
 
-    // Define states for your bot
     private enum BotState {
         NONE,
         AWAITING_CITY,
@@ -40,6 +45,7 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
     @Override
     public void consume(Update update) {
         if (update.hasMessage()){
+            String name = update.getMessage().getFrom().getFirstName();
             Long chatId = update.getMessage().getChatId();
             String messageText = update.getMessage().getText();
             BotState state = userStates.getOrDefault(chatId, BotState.NONE);
@@ -54,9 +60,13 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
                     break;
                 case AWAITING_CITY:
                     try {
-                        List<Double> coordinates = cityService.getCoordinates(messageText);
+                        List<Double> coordinates = coordinatesService.getCoordinates(messageText);
                         if (coordinates != null){
-                            printMessage(chatId, "Your city is " + messageText);
+                            City city = cityInitialization.cityStart(messageText, coordinates.get(0), coordinates.get(1));
+                            if (city == null){
+                                throw new RuntimeException("City object is null");
+                            }
+                            initialization.userStart(chatId, name, city);
                             printMessage(chatId, "We are done with initialization!");
                             printMessage(chatId, "Enter /start to begin");
                             userStates.remove(chatId);
@@ -65,7 +75,7 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
                         }
                     }catch (Exception e){
                         printMessage(chatId, "Something went wrong, please enter yor city again");
-                        log.error("Failed to get coordinates for " + messageText + " " + e.getMessage());
+                        log.error("Failed to get coordinates for " + messageText + " " + e);
                     }
                     break;
             }
@@ -80,7 +90,7 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
                     .build();
             telegramClient.execute(message);
         }catch (Exception e){
-            log.error("Failed to write message " + messageText + " " + e.getMessage());
+            log.error("Failed to write message " + messageText + " " + e);
         }
     }
 }

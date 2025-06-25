@@ -2,12 +2,10 @@ package com.ilyaproject.newsTelegramBot.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,8 +20,9 @@ public class User {
     @NotNull
     private Long chatId;
     @NotNull
-    private String cityName;
-    @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "city_id", referencedColumnName = "cityId")
+    private City city;
 }
