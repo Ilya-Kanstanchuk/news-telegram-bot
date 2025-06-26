@@ -1,6 +1,7 @@
 package com.ilyaproject.newsTelegramBot.bot;
 
 import com.ilyaproject.newsTelegramBot.city.controller.CityInitialization;
+import com.ilyaproject.newsTelegramBot.currency.controller.CurrencyController;
 import com.ilyaproject.newsTelegramBot.model.City;
 import com.ilyaproject.newsTelegramBot.model.User;
 import com.ilyaproject.newsTelegramBot.news.controller.NewsController;
@@ -35,7 +36,11 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
     @Autowired
     private CoordinatesService coordinatesService;
     @Autowired
-    private NewsController controller;
+    private CurrencyController currencyController;
+    @Autowired
+    private WeatherController weatherController;
+    @Autowired
+    private NewsController newsController;
     private final String welcomeMessage = "Hi, I'm Morning Bot and my goal is to make your morning more informative. " +
             "I'm going to send you latest news articles, currency information and weather in your city. To continue " +
             "please enter your city name: ";
@@ -63,8 +68,7 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
                         printMessage(chatId, welcomeMessage);
                         userStates.put(chatId, BotState.AWAITING_CITY);
                     }else{
-                        printMessage(chatId, controller.getNews());
-                        //printMessage(chatId, "Please enter /start to begin");
+                        printMessage(chatId, "Please enter /start to begin");
                     }
                     break;
                 case AWAITING_CITY:
