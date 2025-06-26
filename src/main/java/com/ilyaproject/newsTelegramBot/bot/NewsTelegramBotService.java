@@ -12,6 +12,7 @@ import com.ilyaproject.newsTelegramBot.weather.service.CoordinatesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
@@ -95,7 +96,7 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
         }
     }
 
-    private void printMessage(Long chatId, String messageText){
+    public void printMessage(Long chatId, String messageText){
         try {
             SendMessage message = SendMessage.builder()
                     .text(messageText)
@@ -106,4 +107,18 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
             log.error("Failed to write message " + messageText + " " + e);
         }
     }
+
+
+
+//    @Scheduled(cron = "0 29 15 * * *", zone = "Europe/Warsaw")
+//    public void sendMorningMessageToTheUsers(){
+//        List<User> users = repository.findAll();
+//        for (User user: users){
+//            printMessage(user.getChatId(), weatherController.getForecast(user.getCity().getLatitude(), user.getCity().getLongitude(), user.getCity().getName()));
+//            printMessage(user.getChatId(), newsController.getNews());
+//            printMessage(user.getChatId(), currencyController.getCurrencies());
+//        }
+//    }
+//@Scheduled(cron = "0 59 14 * * *", zone = "Europe/Warsaw")
+//public void quickTest() { log.info("tick"); }
 }
