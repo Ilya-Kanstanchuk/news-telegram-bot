@@ -107,18 +107,4 @@ public class NewsTelegramBotService implements LongPollingSingleThreadUpdateCons
             log.error("Failed to write message " + messageText + " " + e);
         }
     }
-
-
-
-//    @Scheduled(cron = "0 29 15 * * *", zone = "Europe/Warsaw")
-//    public void sendMorningMessageToTheUsers(){
-//        List<User> users = repository.findAll();
-//        for (User user: users){
-//            printMessage(user.getChatId(), weatherController.getForecast(user.getCity().getLatitude(), user.getCity().getLongitude(), user.getCity().getName()));
-//            printMessage(user.getChatId(), newsController.getNews());
-//            printMessage(user.getChatId(), currencyController.getCurrencies());
-//        }
-//    }
-//@Scheduled(cron = "0 59 14 * * *", zone = "Europe/Warsaw")
-//public void quickTest() { log.info("tick"); }
 }
